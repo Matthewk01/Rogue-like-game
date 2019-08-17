@@ -4,15 +4,15 @@
 
 #define MAX_BAR_COUNT 20
 
-typedef enum PlayerType {
+typedef enum {
     KNIGHT,
     RANGER,
     ROGUE,
     MAGE
-} PlayerType;
+} CharacterClass;
 
 typedef struct {
-    PlayerType role;
+    CharacterClass role;
     char *name;
     int hp;
     int HP_MAX;
@@ -22,20 +22,20 @@ typedef struct {
     int level;
     int experiences;
     //Inventory
-} Player;
+} Character;
 
-const char *printPlayerType(PlayerType type);
+const char *printPlayerType(CharacterClass type);
 
-Player *initPlayer(const char *name, PlayerType role);
+Character *initPlayer(const char *name, CharacterClass role);
 
-void freePlayer(Player *player);
+void freePlayer(Character *player);
 
-bool isAlive(Player *player);
+bool isAlive(Character *player);
 
-void attackPlayer(Player *from, Player *to);
+void attackPlayer(Character *from, Character *to);
 
-void checkLevelUp(Player *player);
+void checkLevelUp(Character *player);
 
-void showGraphicHP(Player *player);
+void showGraphicHP(Character *player);
 
-void printPlayer(Player *playerPtr);
+void printPlayer(Character *playerPtr);

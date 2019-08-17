@@ -4,7 +4,7 @@
 #include <string.h>
 #include "character.h"
 
-const char *printPlayerType(PlayerType type) {
+const char *printPlayerType(CharacterClass type) {
     const char *typeStr;
     switch (type) {
         case KNIGHT:
@@ -25,9 +25,9 @@ const char *printPlayerType(PlayerType type) {
     return typeStr;
 }
 
-Player *initPlayer(const char *name, PlayerType role) {
+Character *initPlayer(const char *name, CharacterClass role) {
     static int playerCount = 0;
-    Player *tmpPlayer = (Player *) malloc(sizeof(Player));
+    Character *tmpPlayer = (Character *) malloc(sizeof(Character));
     playerCount += 1;
 
     if (playerCount > 1) {
@@ -75,16 +75,16 @@ Player *initPlayer(const char *name, PlayerType role) {
     return tmpPlayer;
 }
 
-void freePlayer(Player *player) {
+void freePlayer(Character *player) {
     free(player->name);
     free(player);
 }
 
-bool isAlive(Player *player) {
+bool isAlive(Character *player) {
     return player->hp > 0;
 }
 
-void attackPlayer(Player *from, Player *to) {
+void attackPlayer(Character *from, Character *to) {
     int damage = from->damage - to->defense;
     if (!isAlive(to)) {
         printf("The target is already dead!\n");
@@ -100,7 +100,7 @@ void attackPlayer(Player *from, Player *to) {
     }
 }
 
-void checkLevelUp(Player *player) {
+void checkLevelUp(Character *player) {
     if (player->experiences > 99) {
         player->experiences = 0;
         player->level += 1;
@@ -108,7 +108,7 @@ void checkLevelUp(Player *player) {
     }
 }
 
-void showGraphicHP(Player *player) {
+void showGraphicHP(Character *player) {
     int barCount = ceil((1.0 * player->hp / player->HP_MAX) * MAX_BAR_COUNT);
     printf("HP_BAR(%d/%d): <", barCount, MAX_BAR_COUNT);
     int i;
@@ -122,7 +122,7 @@ void showGraphicHP(Player *player) {
     putchar('\n');
 }
 
-void printPlayer(Player *playerPtr) {
+void printPlayer(Character *playerPtr) {
     printf("<%s> %s: damage: %d, defense: %d, level: %d, experiences: %d.\n",
            printPlayerType(playerPtr->role), playerPtr->name, playerPtr->damage, playerPtr->defense, playerPtr->level,
            playerPtr->experiences);
