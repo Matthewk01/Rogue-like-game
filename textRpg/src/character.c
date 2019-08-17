@@ -35,6 +35,7 @@ Player *playerInit(const char *name, PlayerClass role) {
     tmpPlayer->name = strdup(name);
     tmpPlayer->level = 1;
     tmpPlayer->experiences = 0;
+    tmpPlayer->positionX = 0;
     switch (role) {
         case KNIGHT:
             tmpPlayer->charClass = KNIGHT;
@@ -103,41 +104,34 @@ void playerGraphicPrintHP(Player *player) {
 }
 
 void playerPrintOverview(Player *playerPtr) {
+    for (int i = 0; i < 90; ++i) putchar('*');
+    putchar('\n');
     printf("<%s> %s: damage: %d, defense: %d, level: %d, experiences: %d.\n",
-           playerPrintType(playerPtr->charClass), playerPtr->name, playerPtr->damage, playerPtr->defense, playerPtr->level,
+           playerPrintType(playerPtr->charClass), playerPtr->name, playerPtr->damage, playerPtr->defense,
+           playerPtr->level,
            playerPtr->experiences);
     playerGraphicPrintHP(playerPtr);
-}
-
-void playerAttack(Player *from, Monster *to) {
-    int damage = from->damage - to->defense;
-    if (!monsterIsAlive(to)) {
-        printf("The target is already dead!\n");
-    } else {
-        if (damage <= 0) {
-            printf("Monster managed to block the player's %s attack!", from->name);
-        } else {
-            to->hp -= (damage);
-            if (to->hp < 0) to->hp = 0;
-            printf("Player '%s' dealed '%d' damage. Enemy's hp: %d\n", from->name, damage,
-                   to->hp);
-        }
-    }
+    for (int i = 0; i < 90; ++i) putchar('*');
+    putchar('\n');
 }
 
 PlayerClass playerParseClass(const char *cls) {
     PlayerClass playClass;
-    if(strncmp("KNIGHT", cls, 20) == 0)
+    if (strncmp("KNIGHT", cls, 20) == 0)
         playClass = KNIGHT;
-    else if(strncmp("RANGER", cls, 20) == 0)
+    else if (strncmp("RANGER", cls, 20) == 0)
         playClass = RANGER;
-    else if(strncmp("ROGUE", cls, 20) == 0)
+    else if (strncmp("ROGUE", cls, 20) == 0)
         playClass = ROGUE;
-    else if(strncmp("MAGE", cls, 20) == 0)
+    else if (strncmp("MAGE", cls, 20) == 0)
         playClass = MAGE;
     else
-        playClass = KNIGHT;
+        playClass = ERR;
     return playClass;
+}
+
+void playerMoveTo(Player *player, int xPosition) {
+    player->positionX = xPosition;
 }
 
 

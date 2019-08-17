@@ -1,9 +1,9 @@
 #include "monster.h"
 
 Monster *monsterInit() {
-    Monster *monster = (Monster*) malloc(sizeof(*monster));
+    Monster *monster = (Monster *) malloc(sizeof(*monster));
 
-    monster->damage = 15;
+    monster->damage = 3;
     monster->hp = 150;
     monster->HP_MAX = 150;
     monster->defense = 10;
@@ -27,24 +27,17 @@ void monsterGraphicPrintHP(Monster *monster) {
 }
 
 void monsterPrintOverview(Monster *monster) {
+    for (int i = 0; i < 90; ++i) putchar('*');
+    putchar('\n');
     printf("Monster: damage: %d, defense: %d, level: %d.\n",
            monster->damage, monster->defense, monster->level);
     monsterGraphicPrintHP(monster);
+    for (int i = 0; i < 90; ++i) putchar('*');
+    putchar('\n');
 }
 
-void monsterAttack(Monster *from, Player *to) {
-    int damage = from->damage - to->defense;
-    if (!playerIsAlive(to)) {
-        printf("The target is already dead!\n");
-    } else {
-        if (damage <= 0) {
-            printf("Player '%s' managed to block the monster's attack!", to->name);
-        } else {
-            to->hp -= (damage);
-            if (to->hp < 0) to->hp = 0;
-            printf("Monster dealed '%d' damage. Player's '%s' hp: %d\n", damage, to->name,
-                   to->hp);
-        }
-    }
+bool monsterIsAlive(Monster *monster) {
+    return monster->hp > 0;
 }
+
 

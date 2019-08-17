@@ -5,7 +5,6 @@
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
-#include "monster.h"
 
 #define MAX_BAR_COUNT 20
 
@@ -13,10 +12,11 @@ typedef enum {
     KNIGHT,
     RANGER,
     ROGUE,
-    MAGE
+    MAGE,
+    ERR
 } PlayerClass;
 
-typedef struct Player{
+typedef struct Player {
     PlayerClass charClass;
     char *name;
     int hp;
@@ -26,6 +26,7 @@ typedef struct Player{
     bool isAI;
     int level;
     int experiences;
+    int positionX;
     //Inventory
 } Player;
 
@@ -37,8 +38,6 @@ void playerFree(Player *player);
 
 bool playerIsAlive(Player *player);
 
-void playerAttack(Player *from, Monster *to);
-
 void playerCheckLevelUp(Player *player);
 
 void playerGraphicPrintHP(Player *player);
@@ -46,3 +45,5 @@ void playerGraphicPrintHP(Player *player);
 void playerPrintOverview(Player *playerPtr);
 
 PlayerClass playerParseClass(const char *cls);
+
+void playerMoveTo(Player *player, int xPosition);
