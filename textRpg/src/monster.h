@@ -24,4 +24,4 @@ void monsterPrintOverview(Monster *monster);
 
 void monsterGraphicPrintHP(Monster *monster);
 
-void monsterAttack(Monster *from,  Player *to);
+void monsterAttack(Monster *from, Player *to);

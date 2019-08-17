@@ -16,7 +16,7 @@ typedef enum {
     MAGE
 } PlayerClass;
 
-typedef struct Player {
+typedef struct Player{
     PlayerClass charClass;
     char *name;
     int hp;
@@ -45,4 +45,4 @@ void playerGraphicPrintHP(Player *player);
 
 void playerPrintOverview(Player *playerPtr);
 
-PlayerClass playerParseClass(const char *class);
+PlayerClass playerParseClass(const char *cls);

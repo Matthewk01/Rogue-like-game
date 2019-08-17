@@ -13,7 +13,7 @@ typedef enum enemyInteractionChoice {
     RUN,
 } enemyInteractionChoice;
 
-oid startFight(Player *player, Monster *monster)
+void startFight(Player *player, Monster *monster);
 
 enemyInteractionChoice interactionMenu();
 

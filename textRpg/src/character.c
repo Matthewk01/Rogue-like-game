@@ -125,15 +125,15 @@ void playerAttack(Player *from, Monster *to) {
     }
 }
 
-PlayerClass playerParseClass(const char *class) {
+PlayerClass playerParseClass(const char *cls) {
     PlayerClass playClass;
-    if(strncmp("KNIGHT", class, 20) == 0)
+    if(strncmp("KNIGHT", cls, 20) == 0)
         playClass = KNIGHT;
-    else if(strncmp("RANGER", class, 20) == 0)
+    else if(strncmp("RANGER", cls, 20) == 0)
         playClass = RANGER;
-    else if(strncmp("ROGUE", class, 20) == 0)
+    else if(strncmp("ROGUE", cls, 20) == 0)
         playClass = ROGUE;
-    else if(strncmp("MAGE", class, 20) == 0)
+    else if(strncmp("MAGE", cls, 20) == 0)
         playClass = MAGE;
     else
         playClass = KNIGHT;
