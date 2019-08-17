@@ -1,6 +1,11 @@
 #pragma once
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
 #include <stdbool.h>
+#include "monster.h"
 
 #define MAX_BAR_COUNT 20
 
@@ -9,10 +14,10 @@ typedef enum {
     RANGER,
     ROGUE,
     MAGE
-} CharacterClass;
+} PlayerClass;
 
-typedef struct {
-    CharacterClass role;
+typedef struct Player {
+    PlayerClass charClass;
     char *name;
     int hp;
     int HP_MAX;
@@ -22,20 +27,22 @@ typedef struct {
     int level;
     int experiences;
     //Inventory
-} Character;
+} Player;
 
-const char *printPlayerType(CharacterClass type);
+const char *playerPrintType(PlayerClass type);
 
-Character *initPlayer(const char *name, CharacterClass role);
+Player *playerInit(const char *name, PlayerClass role);
 
-void freePlayer(Character *player);
+void playerFree(Player *player);
 
-bool isAlive(Character *player);
+bool playerIsAlive(Player *player);
 
-void attackPlayer(Character *from, Character *to);
+void playerAttack(Player *from, Monster *to);
 
-void checkLevelUp(Character *player);
+void playerCheckLevelUp(Player *player);
 
-void showGraphicHP(Character *player);
+void playerGraphicPrintHP(Player *player);
 
-void printPlayer(Character *playerPtr);
+void playerPrintOverview(Player *playerPtr);
+
+PlayerClass playerParseClass(const char *class);

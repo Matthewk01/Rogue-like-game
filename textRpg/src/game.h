@@ -6,11 +6,15 @@
 #include "character.h"
 #include "map.h"
 
+bool gameIsRunning = true;
+
 typedef enum enemyInteractionChoice {
     ATTACK,
     RUN,
 } enemyInteractionChoice;
 
-void startFight(Character *player1, Character *player2);
+oid startFight(Player *player, Monster *monster)
 
 enemyInteractionChoice interactionMenu();
+
+void gameLoop();

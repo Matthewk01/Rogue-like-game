@@ -1,4 +1,5 @@
 #include "game.h"
+#include "monster.h"
 
 enemyInteractionChoice interactionMenu() {
     int input;
@@ -12,52 +13,68 @@ enemyInteractionChoice interactionMenu() {
     return (input == 1 ? ATTACK : RUN);
 }
 
-void startFight(Character *player1, Character *player2) {
-    Character *from = player1, *to = player2, *tmp;
+void startFight(Player *player, Monster *monster) {
     putchar('\n');
-    printf("Fight initiated between '%s' and '%s'\n", from->name, to->name);
-    while (isAlive(from) && isAlive(to)) {
+    printf("Fight initiated!\n");
+    while (playerIsAlive(player) && monsterIsAlive(monster)) {
         // Print player overview
         putchar('\n');
-        printPlayer(player1);
-        printPlayer(player2);
+        playerPrintOverview(player);
+        monsterPrintOverview(monster);
 
         // Menu
         enemyInteractionChoice choice;
-        if (!from->isAI) {
-            choice = interactionMenu();
-        } else {
-            printf("Enemy attacks!\n");
-            choice = ATTACK;
-        }
+        choice = interactionMenu();
+
         // Handle choice
         switch (choice) {
             case ATTACK:
-                attackPlayer(from, to);
+                playerAttack(player, monster);
                 break;
             case RUN:
-                printf("Player %s decides to run away!\n", from->name);
+                printf("Player %s decides to run away!\n", player->name);
                 return;
             default:
                 printf("Error: Undefined choice.");
                 break;
         }
-        // Swap players
-        if (isAlive(to)) {
-            tmp = from;
-            from = to;
-            to = tmp;
-        } else {
-            printf("'%s' wins the fight!\n", from->name);
-            if (!from->isAI) {
-                int exp = to->level * 100;
-                from->experiences += exp;
-                printf("You've gained %d experiences!\n", exp);
-                checkLevelUp(from);
-            }
+
+        // Monster attack
+        monsterAttack(monster, player);
+
+        // Check whether someone died
+        if(!monsterIsAlive(monster)){
+            printf("'%s' wins the fight!\n", player->name);
+            int exp = monster->level * 100;
+            player->experiences += exp;
+            printf("You've gained %d experiences!\n", exp);
+            playerCheckLevelUp(player);
+            return;
+        } else if(!playerIsAlive(player)) {
+            printf("Monster managed to defeat you!");
+            return;
         }
 
         // Wait for 250ms
         Sleep(250);
+    }
+}
+
+void gameLoop() {
+    printf("Choose name:\n>> ");
+    char name[20];
+    scanf("%s", name);
+    printf("Choose class: (KNIGHT, RANGER, ROGUE, MAGE)\n>> ");
+    char class[20];
+    scanf("%s", class);
+    Player *hero = playerInit(name, playerParseClass(class));
+    Monster *testMonster = monsterInit();
+    while(gameIsRunning) {
+        // load save file, otherwise create new Character
+        // render playerOverview
+        // render map
+        // render choiceMenu
+        startFight(hero, testMonster);
+
     }
 }

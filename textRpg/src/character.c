@@ -1,10 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
 #include "character.h"
 
-const char *printPlayerType(CharacterClass type) {
+const char *playerPrintType(PlayerClass type) {
     const char *typeStr;
     switch (type) {
         case KNIGHT:
@@ -25,9 +21,9 @@ const char *printPlayerType(CharacterClass type) {
     return typeStr;
 }
 
-Character *initPlayer(const char *name, CharacterClass role) {
+Player *playerInit(const char *name, PlayerClass role) {
     static int playerCount = 0;
-    Character *tmpPlayer = (Character *) malloc(sizeof(Character));
+    Player *tmpPlayer = (Player *) malloc(sizeof(Player));
     playerCount += 1;
 
     if (playerCount > 1) {
@@ -41,32 +37,32 @@ Character *initPlayer(const char *name, CharacterClass role) {
     tmpPlayer->experiences = 0;
     switch (role) {
         case KNIGHT:
-            tmpPlayer->role = KNIGHT;
+            tmpPlayer->charClass = KNIGHT;
             tmpPlayer->hp = 100;
             tmpPlayer->HP_MAX = 100;
-            tmpPlayer->damage = 25;
-            tmpPlayer->defense = 25;
-            break;
-        case RANGER:
-            tmpPlayer->role = RANGER;
-            tmpPlayer->hp = 80;
-            tmpPlayer->HP_MAX = 80;
-            tmpPlayer->damage = 40;
+            tmpPlayer->damage = 6;
             tmpPlayer->defense = 12;
             break;
+        case RANGER:
+            tmpPlayer->charClass = RANGER;
+            tmpPlayer->hp = 80;
+            tmpPlayer->HP_MAX = 80;
+            tmpPlayer->damage = 9;
+            tmpPlayer->defense = 6;
+            break;
         case ROGUE:
-            tmpPlayer->role = ROGUE;
+            tmpPlayer->charClass = ROGUE;
             tmpPlayer->hp = 90;
             tmpPlayer->HP_MAX = 90;
-            tmpPlayer->damage = 40;
-            tmpPlayer->defense = 10;
+            tmpPlayer->damage = 14;
+            tmpPlayer->defense = 5;
             break;
         case MAGE:
-            tmpPlayer->role = MAGE;
+            tmpPlayer->charClass = MAGE;
             tmpPlayer->hp = 50;
             tmpPlayer->HP_MAX = 50;
-            tmpPlayer->damage = 50;
-            tmpPlayer->defense = 5;
+            tmpPlayer->damage = 18;
+            tmpPlayer->defense = 3;
             break;
         default:
             free(tmpPlayer);
@@ -75,32 +71,16 @@ Character *initPlayer(const char *name, CharacterClass role) {
     return tmpPlayer;
 }
 
-void freePlayer(Character *player) {
+void playerFree(Player *player) {
     free(player->name);
     free(player);
 }
 
-bool isAlive(Character *player) {
+bool playerIsAlive(Player *player) {
     return player->hp > 0;
 }
 
-void attackPlayer(Character *from, Character *to) {
-    int damage = from->damage - to->defense;
-    if (!isAlive(to)) {
-        printf("The target is already dead!\n");
-    } else {
-        if (damage <= 0) {
-            printf("Player %s managed to block the player's %s attack!", to->name, from->name);
-        } else {
-            to->hp -= (damage);
-            if (to->hp < 0) to->hp = 0;
-            printf("Player '%s' dealed '%d' damage to player '%s'. Player's '%s' hp: %d\n", from->name, damage,
-                   to->name, to->name, to->hp);
-        }
-    }
-}
-
-void checkLevelUp(Character *player) {
+void playerCheckLevelUp(Player *player) {
     if (player->experiences > 99) {
         player->experiences = 0;
         player->level += 1;
@@ -108,7 +88,7 @@ void checkLevelUp(Character *player) {
     }
 }
 
-void showGraphicHP(Character *player) {
+void playerGraphicPrintHP(Player *player) {
     int barCount = ceil((1.0 * player->hp / player->HP_MAX) * MAX_BAR_COUNT);
     printf("HP_BAR(%d/%d): <", barCount, MAX_BAR_COUNT);
     int i;
@@ -122,9 +102,42 @@ void showGraphicHP(Character *player) {
     putchar('\n');
 }
 
-void printPlayer(Character *playerPtr) {
+void playerPrintOverview(Player *playerPtr) {
     printf("<%s> %s: damage: %d, defense: %d, level: %d, experiences: %d.\n",
-           printPlayerType(playerPtr->role), playerPtr->name, playerPtr->damage, playerPtr->defense, playerPtr->level,
+           playerPrintType(playerPtr->charClass), playerPtr->name, playerPtr->damage, playerPtr->defense, playerPtr->level,
            playerPtr->experiences);
-    showGraphicHP(playerPtr);
+    playerGraphicPrintHP(playerPtr);
 }
+
+void playerAttack(Player *from, Monster *to) {
+    int damage = from->damage - to->defense;
+    if (!monsterIsAlive(to)) {
+        printf("The target is already dead!\n");
+    } else {
+        if (damage <= 0) {
+            printf("Monster managed to block the player's %s attack!", from->name);
+        } else {
+            to->hp -= (damage);
+            if (to->hp < 0) to->hp = 0;
+            printf("Player '%s' dealed '%d' damage. Enemy's hp: %d\n", from->name, damage,
+                   to->hp);
+        }
+    }
+}
+
+PlayerClass playerParseClass(const char *class) {
+    PlayerClass playClass;
+    if(strncmp("KNIGHT", class, 20) == 0)
+        playClass = KNIGHT;
+    else if(strncmp("RANGER", class, 20) == 0)
+        playClass = RANGER;
+    else if(strncmp("ROGUE", class, 20) == 0)
+        playClass = ROGUE;
+    else if(strncmp("MAGE", class, 20) == 0)
+        playClass = MAGE;
+    else
+        playClass = KNIGHT;
+    return playClass;
+}
+
+
