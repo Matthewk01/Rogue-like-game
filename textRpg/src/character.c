@@ -146,6 +146,22 @@ void playerMoveTo(Player *player, int xPosition) {
     player->positionX = xPosition;
 }
 
+void playerAttackMonster(Player *from, Monster *to) {
+    int damage = from->damage - to->defense;
+    if (!monsterIsAlive(to)) {
+        printf("The target is already dead!\n");
+    } else {
+        if (damage <= 0) {
+            printf("Monster managed to block the player's %s attack!\n", from->name);
+        } else {
+            to->hp -= (damage);
+            if (to->hp < 0) to->hp = 0;
+            printf("Player '%s' dealed '%d' damage. Enemy's hp: %d\n", from->name, damage,
+                   to->hp);
+        }
+    }
+}
+
 
 
 

@@ -12,38 +12,6 @@ FightInteractionChoice gameFightInteractionMenu() {
     return (input == 1 ? ATTACK : RUN);
 }
 
-void gamePlayerAttack(Player *from, Monster *to) {
-    int damage = from->damage - to->defense;
-    if (!monsterIsAlive(to)) {
-        printf("The target is already dead!\n");
-    } else {
-        if (damage <= 0) {
-            printf("Monster managed to block the player's %s attack!\n", from->name);
-        } else {
-            to->hp -= (damage);
-            if (to->hp < 0) to->hp = 0;
-            printf("Player '%s' dealed '%d' damage. Enemy's hp: %d\n", from->name, damage,
-                   to->hp);
-        }
-    }
-}
-
-void gameMonsterAttack(Monster *from, Player *to) {
-    int damage = from->damage - to->defense;
-    if (!playerIsAlive(to)) {
-        printf("The target is already dead!\n");
-    } else {
-        if (damage <= 0) {
-            printf("Player managed to block the monster's attack!\n");
-        } else {
-            to->hp -= (damage);
-            if (to->hp < 0) to->hp = 0;
-            printf("Monster dealed '%d' damage. Enemy's hp: %d\n", damage,
-                   to->hp);
-        }
-    }
-}
-
 void gameStartFightBetween(Player *player, Monster *monster) {
     putchar('\n');
     printf("Fight initiated!\n");
@@ -61,7 +29,7 @@ void gameStartFightBetween(Player *player, Monster *monster) {
         // Handle choice
         switch (choice) {
             case ATTACK:
-                gamePlayerAttack(player, monster);
+                playerAttackMonster(player, monster);
                 break;
             case RUN:
                 printf("Player %s decides to run away!\n", player->name);
@@ -72,7 +40,7 @@ void gameStartFightBetween(Player *player, Monster *monster) {
         }
 
         // Monster attack
-        gameMonsterAttack(monster, player);
+        monsterAttackPlayer(monster, player);
 
         // Check whether someone died
         if (!monsterIsAlive(monster)) {
@@ -182,8 +150,6 @@ void gameLoop() {
         mapPrint(&map);
         // render choiceMenu
         gameMapInteractionMenu();
-        // startFight(map.player, testMonster);
-
     }
     playerFree(map.player);
 

@@ -5,7 +5,7 @@
 
 #define MAX_BAR_COUNT 20
 #define INVENTORY_SLOTS 5
-typedef enum {
+typedef enum PlayerClass{
     KNIGHT,
     RANGER,
     ROGUE,
@@ -45,3 +45,6 @@ void playerPrintOverview(Player *playerPtr);
 PlayerClass playerParseClass(const char *cls);
 
 void playerMoveTo(Player *player, int xPosition);
+
+typedef struct Monster Monster;
+void playerAttackMonster(Player *from, Monster *to);

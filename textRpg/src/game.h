@@ -23,10 +23,6 @@ FightInteractionChoice gameFightInteractionMenu();
 
 void gameLoop();
 
-void gamePlayerAttack(Player *from, Monster *to);
-
-void gameMonsterAttack(Monster *from, Player *to);
-
 void gameMapInteractionMenu();
 
 Player *gameCreateCharacter();

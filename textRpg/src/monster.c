@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "monster.h"
+#include "character.h"
 
 Monster *monsterInit() {
     Monster *monster = (Monster *) malloc(sizeof(*monster));
@@ -41,5 +42,21 @@ void monsterPrintOverview(Monster *monster) {
 
 bool monsterIsAlive(Monster *monster) {
     return monster->hp > 0;
+}
+
+void monsterAttackPlayer(Monster *from, Player *to) {
+    int damage = from->damage - to->defense;
+    if (!playerIsAlive(to)) {
+        printf("The target is already dead!\n");
+    } else {
+        if (damage <= 0) {
+            printf("Player managed to block the monster's attack!\n");
+        } else {
+            to->hp -= (damage);
+            if (to->hp < 0) to->hp = 0;
+            printf("Monster dealed '%d' damage. Enemy's hp: %d\n", damage,
+                   to->hp);
+        }
+    }
 }
 
