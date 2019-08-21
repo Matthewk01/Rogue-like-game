@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "map.h"
 
 void mapPrint(Map *map) {

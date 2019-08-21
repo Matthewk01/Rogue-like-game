@@ -1,13 +1,10 @@
 #pragma once
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
 #include <stdbool.h>
+#include "inventory.h"
 
 #define MAX_BAR_COUNT 20
-
+#define INVENTORY_SLOTS 5
 typedef enum {
     KNIGHT,
     RANGER,
@@ -28,6 +25,7 @@ typedef struct Player {
     int experiences;
     int positionX;
     //Inventory
+    Item inventory[INVENTORY_SLOTS];
 } Player;
 
 const char *playerPrintType(PlayerClass type);

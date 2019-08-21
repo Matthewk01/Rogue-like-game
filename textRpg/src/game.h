@@ -29,5 +29,5 @@ void gameMonsterAttack(Monster *from, Player *to);
 
 void gameMapInteractionMenu();
 
-Player* gameCreateCharacter();
+Player *gameCreateCharacter();
 

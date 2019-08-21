@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include "monster.h"
 
 Monster *monsterInit() {
@@ -39,5 +42,4 @@ void monsterPrintOverview(Monster *monster) {
 bool monsterIsAlive(Monster *monster) {
     return monster->hp > 0;
 }
-
 

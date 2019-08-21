@@ -1,4 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
 #include "character.h"
+#include "map.h"
 
 const char *playerPrintType(PlayerClass type) {
     const char *typeStr;
@@ -32,10 +37,16 @@ Player *playerInit(const char *name, PlayerClass role) {
         tmpPlayer->isAI = false;
     }
 
+    // Init inventory
+    inventoryInit(tmpPlayer);
+
+    // Init attributes
     tmpPlayer->name = strdup(name);
     tmpPlayer->level = 1;
     tmpPlayer->experiences = 0;
     tmpPlayer->positionX = 0;
+
+    // Role specific attributes
     switch (role) {
         case KNIGHT:
             tmpPlayer->charClass = KNIGHT;
@@ -111,6 +122,7 @@ void playerPrintOverview(Player *playerPtr) {
            playerPtr->level,
            playerPtr->experiences);
     playerGraphicPrintHP(playerPtr);
+    inventoryPrint(playerPtr);
     for (int i = 0; i < 90; ++i) putchar('*');
     putchar('\n');
 }
@@ -133,5 +145,7 @@ PlayerClass playerParseClass(const char *cls) {
 void playerMoveTo(Player *player, int xPosition) {
     player->positionX = xPosition;
 }
+
+
 
 

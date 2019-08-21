@@ -51,6 +51,7 @@ void gameStartFightBetween(Player *player, Monster *monster) {
         // Print player overview
         putchar('\n');
         playerPrintOverview(player);
+        printf("VS\n");
         monsterPrintOverview(monster);
 
         // Menu
@@ -132,13 +133,13 @@ void gameMapInteractionMenu() {
     bool isCorr;
     do {
         printf(">> ");
-        if(scanf("%d", &input) != 1 || input < 1 || input > choiceCount) {
+        if (scanf("%d", &input) != 1 || input < 1 || input > choiceCount) {
             isCorr = false;
-            while(getchar() != '\n');
+            while (getchar() != '\n');
         } else {
             isCorr = true;
         }
-    } while(!isCorr);
+    } while (!isCorr);
     switch (input) {
         case 1:
             if (mapPlayerMove(map.player, -1)) {

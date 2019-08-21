@@ -5,11 +5,12 @@
 
 #define ROOM_COUNT 5
 
-typedef struct {
+
+typedef struct Room {
     Monster monster;
 } Room;
 
-typedef struct {
+typedef struct Map {
     int playerPosition;
     Player *player;
     Room rooms[ROOM_COUNT];
