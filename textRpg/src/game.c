@@ -25,7 +25,10 @@ const char *gameInteractionEnumGetString(GameInteractionChoice choice) {
             choiceStr = "Use item!";
             break;
         case GO_TO_ROOM:
-            choiceStr = "Go to the room!";
+            choiceStr = "Go to the dungeon!";
+            break;
+        case BUY_ITEMS:
+            choiceStr = "Buy items!";
             break;
         case SAVE_LEAVE:
             choiceStr = "Leave and save the game!";
@@ -127,11 +130,14 @@ void gameInteractionMenu(GameState *game) {
             break;
         case USE_ITEM:
             printf("Which one?\n");
-            inventoryUseItem(game->map.player, gameGetInputIdx("", 0, 5));
+            playerUseItem(game->map.player, gameGetInputIdx("", 1, 5));
             break;
         case GO_TO_ROOM:
             printf("You've gone to the room!\n");
             gameStartFightBetween(game->map.player, &game->map.rooms[game->map.player->positionX].monster);
+            break;
+        case BUY_ITEMS:
+            // NPC menu
             break;
         case SAVE_LEAVE:
             game->gameIsRunning = false;
@@ -161,8 +167,16 @@ void gameStart(GameState *game) {
     // load save file, otherwise create new Character
     game->gameIsRunning = true;
     game->map.player = gameCreateCharacter();
-    game->map.player->inventory[0] = ITEM_HP_POTION;
     mapRoomsInit(&game->map);
+
+    // Test items
+    inventoryPushBackItem(&game->map.player->inventory, &ITEM_HP_POTION);
+    inventoryPushBackItem(&game->map.player->inventory, &ITEM_HP_POTION);
+    inventoryPushBackItem(&game->map.player->inventory, &ITEM_HP_POTION);
+    inventoryPushBackItem(&game->map.player->inventory, &ITEM_HP_POTION);
+    inventoryPushBackItem(&game->map.player->inventory, &ITEM_SHIELD);
+    inventoryPushBackItem(&game->map.player->inventory, &ITEM_WEAPON);
+
     // Start game loop
     gameLoop(game);
 }

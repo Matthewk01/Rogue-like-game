@@ -4,8 +4,8 @@
 #include "inventory.h"
 
 #define MAX_BAR_COUNT 20
-#define INVENTORY_SLOTS 5
 #define EXP_MAX 100
+#define BORDER_STAR_COUNT 105
 typedef enum CharacterClass {
     CLASS_KNIGHT,
     CLASS_RANGER,
@@ -30,7 +30,8 @@ typedef struct Character {
     int experiences;
     int positionX;
     //Inventory
-    Item inventory[INVENTORY_SLOTS];
+    int currency;
+    Inventory inventory;
 } Character;
 
 Character *characterInit(const char *name, CharacterClass role);
@@ -52,3 +53,5 @@ void characterMoveTo(Character *player, int xPosition);
 typedef struct Monster Monster;
 
 void characterAttackMonster(Character *from, Monster *to);
+
+void playerUseItem(Character *player, int positionIdx);

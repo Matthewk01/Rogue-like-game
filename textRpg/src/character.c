@@ -17,13 +17,14 @@ Character *characterInit(const char *name, CharacterClass role) {
     }
 
     // Init inventory
-    inventoryInit(tmpPlayer);
+    inventoryInit(&tmpPlayer->inventory);
 
     // Init attributes
     tmpPlayer->name = strdup(name);
     tmpPlayer->level = 1;
     tmpPlayer->experiences = 0;
     tmpPlayer->positionX = 0;
+    tmpPlayer->currency = 100;
 
     // Role specific attributes
     switch (role) {
@@ -94,9 +95,9 @@ void characterGraphicPrintHP(Character *player) {
 }
 
 void characterPrintOverview(Character *playerPtr) {
-    for (int i = 0; i < 90; ++i) putchar('*');
+    for (int i = 0; i < BORDER_STAR_COUNT; ++i) putchar('*');
     putchar('\n');
-    printf("<%s> %s: HP:%d/%d, damage: %d, defense: %d, level: %d, experiences: %d.\n",
+    printf("<%s> %s: HP:%d/%d, damage: %d, defense: %d, level: %d, experiences: %d, currency: %dg.\n",
            characterClassEnumGetString(playerPtr->charClass),
            playerPtr->name,
            playerPtr->hp,
@@ -104,11 +105,12 @@ void characterPrintOverview(Character *playerPtr) {
            playerPtr->damage,
            playerPtr->defense,
            playerPtr->level,
-           playerPtr->experiences);
+           playerPtr->experiences,
+           playerPtr->currency);
     characterGraphicPrintHP(playerPtr);
     characterGraphicPrintExpBar(playerPtr);
-    inventoryPrint(playerPtr);
-    for (int i = 0; i < 90; ++i) putchar('*');
+    inventoryPrint(&playerPtr->inventory);
+    for (int i = 0; i < BORDER_STAR_COUNT; ++i) putchar('*');
     putchar('\n');
 }
 
@@ -175,6 +177,33 @@ void characterGraphicPrintExpBar(Character *player) {
     }
     putchar('>');
     putchar('\n');
+}
+
+void playerUseItem(Character *player, int positionIdx) {
+    for (int i = 0; i < INVENTORY_SLOTS; ++i) {
+        if (i == positionIdx) {
+            Item *item = &player->inventory.items[i];
+            switch (player->inventory.items[i].type) {
+                case ITEM_TYPE_HP_POTION:
+                    player->hp += item->hpAmount;
+                    if(player->hp > player->HP_MAX) player->hp = player->HP_MAX;
+                    --item->quantity;
+                    if (item->quantity <= 0) {
+                        *item = ITEM_EMPTY_ITEM;
+                    }
+                    break;
+                case ITEM_TYPE_WEAPON:
+                    break;
+                case ITEM_TYPE_SHIELD:
+                    break;
+                case ITEM_TYPE_EMPTY:
+                default:
+                    printf("Nothing happened!\n");
+                    break;
+            }
+            return;
+        }
+    }
 }
 
 

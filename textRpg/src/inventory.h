@@ -2,6 +2,7 @@
 #define TEXTRPG_INVENTORY_H
 
 #define ITEM_NAME_LENGTH 20
+#define INVENTORY_SLOTS 5
 
 typedef enum ItemType {
     ITEM_TYPE_EMPTY,
@@ -19,23 +20,26 @@ typedef struct Item {
     int quantity;
 } Item;
 
+typedef struct Inventory {
+    Item items[INVENTORY_SLOTS];
+} Inventory;
+
+// Predefined items
 const Item ITEM_EMPTY_ITEM;
-
 const Item ITEM_HP_POTION;
+const Item ITEM_WEAPON;
+const Item ITEM_SHIELD;
 
-typedef struct Character Character;
 
 Item *inventoryCreateItem(ItemType type);
 
-void inventoryInit(Character *player);
+void inventoryInit(Inventory *inv);
 
-void inventoryPushBackItem(Character *player, const Item *item);
+void inventoryPushBackItem(Inventory *inv, const Item *item);
 
-void inventoryRemoveItem(Character *player, int positionIdx);
+void inventoryRemoveItem(Inventory *inv, int positionIdx);
 
-void inventoryUseItem(Character *player, int positionIdx);
-
-void inventoryPrint(Character *player);
+void inventoryPrint(Inventory *inv);
 
 
 #endif //TEXTRPG_INVENTORY_H

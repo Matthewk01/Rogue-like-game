@@ -31,12 +31,12 @@ void monsterGraphicPrintHP(Monster *monster) {
 }
 
 void monsterPrintOverview(Monster *monster) {
-    for (int i = 0; i < 90; ++i) putchar('*');
+    for (int i = 0; i < BORDER_STAR_COUNT; ++i) putchar('*');
     putchar('\n');
     printf("Monster: damage: %d, defense: %d, level: %d.\n",
            monster->damage, monster->defense, monster->level);
     monsterGraphicPrintHP(monster);
-    for (int i = 0; i < 90; ++i) putchar('*');
+    for (int i = 0; i < BORDER_STAR_COUNT; ++i) putchar('*');
     putchar('\n');
 }
 

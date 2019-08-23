@@ -10,6 +10,7 @@ typedef enum GameInteractionChoice {
     MOVE_RIGHT,
     USE_ITEM,
     GO_TO_ROOM,
+    BUY_ITEMS,
     SAVE_LEAVE,
     GAME_INTERACTION_CHOICE_COUNT
 } GameInteractionChoice;

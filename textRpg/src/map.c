@@ -15,7 +15,7 @@ void mapPrint(Map *map) {
         }
     }
     putchar('\n');
-    for (int i = 0; i < 90; ++i) putchar('*');
+    for (int i = 0; i < BORDER_STAR_COUNT; ++i) putchar('*');
     putchar('\n');
 }
 
