@@ -23,20 +23,19 @@ const Item ITEM_EMPTY_ITEM;
 
 const Item ITEM_HP_POTION;
 
-typedef struct Player Player;
+typedef struct Character Character;
 
-Item* inventoryCreateItem(ItemType type);
+Item *inventoryCreateItem(ItemType type);
 
-void inventoryInit(Player *player);
+void inventoryInit(Character *player);
 
-void inventoryPushBackItem(Player *player, const Item *item);
+void inventoryPushBackItem(Character *player, const Item *item);
 
-void inventoryRemoveItem(Player *player, int positionIdx);
+void inventoryRemoveItem(Character *player, int positionIdx);
 
-void inventoryUseItem(Player *player, int positionIdx);
+void inventoryUseItem(Character *player, int positionIdx);
 
-void inventoryPrint(Player *player);
-
+void inventoryPrint(Character *player);
 
 
 #endif //TEXTRPG_INVENTORY_H

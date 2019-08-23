@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
 //        }
 //    }
 //    playerFree(player1);
-    gameLoop();
+    GameState game;
+    gameStart(&game);
     return 0;
 }

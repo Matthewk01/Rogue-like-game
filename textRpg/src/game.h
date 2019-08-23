@@ -1,29 +1,47 @@
 #pragma once
 
-#include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "character.h"
 #include "map.h"
 #include "monster.h"
 #include "map.h"
 
-bool gameIsRunning;
+typedef enum GameInteractionChoice {
+    MOVE_LEFT,
+    MOVE_RIGHT,
+    USE_ITEM,
+    GO_TO_ROOM,
+    SAVE_LEAVE,
+    GAME_INTERACTION_CHOICE_COUNT
+} GameInteractionChoice;
 
-Map map;
+void gameInteractionEnumPrint();
 
-typedef enum {
-    ATTACK,
-    RUN,
+const char *gameInteractionEnumGetString(GameInteractionChoice choice);
+
+typedef enum FightInteractionChoice{
+    FIGHT_ATTACK,
+    FIGHT_RUN,
+    FIGHT_COUNT
 } FightInteractionChoice;
 
-void gameStartFightBetween(Player *player, Monster *monster);
+void gameFightInteractionEnumPrint();
 
-FightInteractionChoice gameFightInteractionMenu();
+const char *gameFightInteractionEnumGetString(FightInteractionChoice choice);
 
-void gameLoop();
+typedef struct GameState {
+    Map map;
+    bool gameIsRunning;
+} GameState;
 
-void gameMapInteractionMenu();
+void gameStartFightBetween(Character *player, Monster *monster);
 
-Player *gameCreateCharacter();
+void gameLoop(GameState *game);
+
+void gameInteractionMenu(GameState *game);
+
+Character *gameCreateCharacter();
+
+void gameStart(GameState *game);
+
+int gameGetInputIdx(const char *str, int from, int to);
 

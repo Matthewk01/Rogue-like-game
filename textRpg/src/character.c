@@ -3,32 +3,11 @@
 #include <math.h>
 #include <string.h>
 #include "character.h"
-#include "map.h"
+#include "monster.h"
 
-const char *playerPrintType(PlayerClass type) {
-    const char *typeStr;
-    switch (type) {
-        case KNIGHT:
-            typeStr = "Knight";
-            break;
-        case RANGER:
-            typeStr = "Ranger";
-            break;
-        case ROGUE:
-            typeStr = "Rogue";
-            break;
-        case MAGE:
-            typeStr = "Mage";
-            break;
-        default:
-            typeStr = "?";
-    }
-    return typeStr;
-}
-
-Player *playerInit(const char *name, PlayerClass role) {
+Character *characterInit(const char *name, CharacterClass role) {
     static int playerCount = 0;
-    Player *tmpPlayer = (Player *) malloc(sizeof(Player));
+    Character *tmpPlayer = (Character *) malloc(sizeof(Character));
     playerCount += 1;
 
     if (playerCount > 1) {
@@ -48,29 +27,29 @@ Player *playerInit(const char *name, PlayerClass role) {
 
     // Role specific attributes
     switch (role) {
-        case KNIGHT:
-            tmpPlayer->charClass = KNIGHT;
+        case CLASS_KNIGHT:
+            tmpPlayer->charClass = CLASS_KNIGHT;
             tmpPlayer->hp = 100;
             tmpPlayer->HP_MAX = 100;
-            tmpPlayer->damage = 6;
-            tmpPlayer->defense = 12;
+            tmpPlayer->damage = 15;
+            tmpPlayer->defense = 9;
             break;
-        case RANGER:
-            tmpPlayer->charClass = RANGER;
+        case CLASS_RANGER:
+            tmpPlayer->charClass = CLASS_RANGER;
             tmpPlayer->hp = 80;
             tmpPlayer->HP_MAX = 80;
-            tmpPlayer->damage = 9;
+            tmpPlayer->damage = 14;
             tmpPlayer->defense = 6;
             break;
-        case ROGUE:
-            tmpPlayer->charClass = ROGUE;
+        case CLASS_ROGUE:
+            tmpPlayer->charClass = CLASS_ROGUE;
             tmpPlayer->hp = 90;
             tmpPlayer->HP_MAX = 90;
-            tmpPlayer->damage = 14;
+            tmpPlayer->damage = 13;
             tmpPlayer->defense = 5;
             break;
-        case MAGE:
-            tmpPlayer->charClass = MAGE;
+        case CLASS_MAGE:
+            tmpPlayer->charClass = CLASS_MAGE;
             tmpPlayer->hp = 50;
             tmpPlayer->HP_MAX = 50;
             tmpPlayer->damage = 18;
@@ -83,16 +62,16 @@ Player *playerInit(const char *name, PlayerClass role) {
     return tmpPlayer;
 }
 
-void playerFree(Player *player) {
+void characterFree(Character *player) {
     free(player->name);
     free(player);
 }
 
-bool playerIsAlive(Player *player) {
+bool characterIsAlive(Character *player) {
     return player->hp > 0;
 }
 
-void playerCheckLevelUp(Player *player) {
+void characterCheckLevelUp(Character *player) {
     if (player->experiences > 99) {
         player->experiences = 0;
         player->level += 1;
@@ -100,9 +79,9 @@ void playerCheckLevelUp(Player *player) {
     }
 }
 
-void playerGraphicPrintHP(Player *player) {
+void characterGraphicPrintHP(Character *player) {
     int barCount = ceil((1.0 * player->hp / player->HP_MAX) * MAX_BAR_COUNT);
-    printf("HP_BAR(%d/%d): <", barCount, MAX_BAR_COUNT);
+    printf("HP_BAR: <");
     int i;
     for (i = 0; i < barCount; ++i) {
         putchar('#');
@@ -114,39 +93,30 @@ void playerGraphicPrintHP(Player *player) {
     putchar('\n');
 }
 
-void playerPrintOverview(Player *playerPtr) {
+void characterPrintOverview(Character *playerPtr) {
     for (int i = 0; i < 90; ++i) putchar('*');
     putchar('\n');
-    printf("<%s> %s: damage: %d, defense: %d, level: %d, experiences: %d.\n",
-           playerPrintType(playerPtr->charClass), playerPtr->name, playerPtr->damage, playerPtr->defense,
+    printf("<%s> %s: HP:%d/%d, damage: %d, defense: %d, level: %d, experiences: %d.\n",
+           characterClassEnumGetString(playerPtr->charClass),
+           playerPtr->name,
+           playerPtr->hp,
+           playerPtr->HP_MAX,
+           playerPtr->damage,
+           playerPtr->defense,
            playerPtr->level,
            playerPtr->experiences);
-    playerGraphicPrintHP(playerPtr);
+    characterGraphicPrintHP(playerPtr);
+    characterGraphicPrintExpBar(playerPtr);
     inventoryPrint(playerPtr);
     for (int i = 0; i < 90; ++i) putchar('*');
     putchar('\n');
 }
 
-PlayerClass playerParseClass(const char *cls) {
-    PlayerClass playClass;
-    if (strncmp("KNIGHT", cls, 20) == 0)
-        playClass = KNIGHT;
-    else if (strncmp("RANGER", cls, 20) == 0)
-        playClass = RANGER;
-    else if (strncmp("ROGUE", cls, 20) == 0)
-        playClass = ROGUE;
-    else if (strncmp("MAGE", cls, 20) == 0)
-        playClass = MAGE;
-    else
-        playClass = ERR;
-    return playClass;
-}
-
-void playerMoveTo(Player *player, int xPosition) {
+void characterMoveTo(Character *player, int xPosition) {
     player->positionX = xPosition;
 }
 
-void playerAttackMonster(Player *from, Monster *to) {
+void characterAttackMonster(Character *from, Monster *to) {
     int damage = from->damage - to->defense;
     if (!monsterIsAlive(to)) {
         printf("The target is already dead!\n");
@@ -160,6 +130,51 @@ void playerAttackMonster(Player *from, Monster *to) {
                    to->hp);
         }
     }
+}
+
+void characterClassEnumPrint() {
+    printf("Choose class:\n");
+    for (int i = 0; i < CLASS_COUNT; ++i) {
+        if (i) putchar(' ');
+        printf("%d) %s", i + 1, characterClassEnumGetString(i));
+    }
+    putchar('\n');
+}
+
+const char *characterClassEnumGetString(CharacterClass choice) {
+    const char *choiceStr;
+    switch (choice) {
+        case CLASS_KNIGHT:
+            choiceStr = "Knight";
+            break;
+        case CLASS_RANGER:
+            choiceStr = "Ranger";
+            break;
+        case CLASS_ROGUE:
+            choiceStr = "Rogue";
+            break;
+        case CLASS_MAGE:
+            choiceStr = "Mage";
+            break;
+        default:
+            choiceStr = "Error!";
+            break;
+    }
+    return choiceStr;
+}
+
+void characterGraphicPrintExpBar(Character *player) {
+    int barCount = ceil((1.0 * player->experiences / EXP_MAX) * MAX_BAR_COUNT);
+    printf("LEVEL_BAR: <");
+    int i;
+    for (i = 0; i < barCount; ++i) {
+        putchar('#');
+    }
+    for (; i < MAX_BAR_COUNT; ++i) {
+        putchar('-');
+    }
+    putchar('>');
+    putchar('\n');
 }
 
 

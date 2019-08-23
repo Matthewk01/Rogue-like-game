@@ -12,7 +12,7 @@ typedef struct Room {
 
 typedef struct Map {
     int playerPosition;
-    Player *player;
+    Character *player;
     Room rooms[ROOM_COUNT];
 } Map;
 
@@ -20,4 +20,4 @@ void mapRoomsInit(Map *map);
 
 void mapPrint(Map *map);
 
-bool mapPlayerMove(Player *player, int dir);
+bool mapPlayerMove(Character *player, int dir);

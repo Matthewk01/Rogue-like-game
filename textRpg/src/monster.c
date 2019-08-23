@@ -44,9 +44,9 @@ bool monsterIsAlive(Monster *monster) {
     return monster->hp > 0;
 }
 
-void monsterAttackPlayer(Monster *from, Player *to) {
+void monsterAttackPlayer(Monster *from, Character *to) {
     int damage = from->damage - to->defense;
-    if (!playerIsAlive(to)) {
+    if (!characterIsAlive(to)) {
         printf("The target is already dead!\n");
     } else {
         if (damage <= 0) {

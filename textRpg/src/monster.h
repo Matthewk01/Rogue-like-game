@@ -20,6 +20,7 @@ void monsterPrintOverview(Monster *monster);
 
 void monsterGraphicPrintHP(Monster *monster);
 
-typedef struct Player Player;
-void monsterAttackPlayer(Monster *from, Player *to);
+typedef struct Character Character;
+
+void monsterAttackPlayer(Monster *from, Character *to);
 

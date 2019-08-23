@@ -5,16 +5,21 @@
 
 #define MAX_BAR_COUNT 20
 #define INVENTORY_SLOTS 5
-typedef enum PlayerClass{
-    KNIGHT,
-    RANGER,
-    ROGUE,
-    MAGE,
-    ERR
-} PlayerClass;
+#define EXP_MAX 100
+typedef enum CharacterClass {
+    CLASS_KNIGHT,
+    CLASS_RANGER,
+    CLASS_ROGUE,
+    CLASS_MAGE,
+    CLASS_COUNT,
+} CharacterClass;
 
-typedef struct Player {
-    PlayerClass charClass;
+void characterClassEnumPrint();
+
+const char *characterClassEnumGetString(CharacterClass choice);
+
+typedef struct Character {
+    CharacterClass charClass;
     char *name;
     int hp;
     int HP_MAX;
@@ -26,25 +31,24 @@ typedef struct Player {
     int positionX;
     //Inventory
     Item inventory[INVENTORY_SLOTS];
-} Player;
+} Character;
 
-const char *playerPrintType(PlayerClass type);
+Character *characterInit(const char *name, CharacterClass role);
 
-Player *playerInit(const char *name, PlayerClass role);
+void characterFree(Character *player);
 
-void playerFree(Player *player);
+bool characterIsAlive(Character *player);
 
-bool playerIsAlive(Player *player);
+void characterCheckLevelUp(Character *player);
 
-void playerCheckLevelUp(Player *player);
+void characterGraphicPrintHP(Character *player);
 
-void playerGraphicPrintHP(Player *player);
+void characterGraphicPrintExpBar(Character *player);
 
-void playerPrintOverview(Player *playerPtr);
+void characterPrintOverview(Character *playerPtr);
 
-PlayerClass playerParseClass(const char *cls);
-
-void playerMoveTo(Player *player, int xPosition);
+void characterMoveTo(Character *player, int xPosition);
 
 typedef struct Monster Monster;
-void playerAttackMonster(Player *from, Monster *to);
+
+void characterAttackMonster(Character *from, Monster *to);

@@ -1,37 +1,85 @@
+#include <windows.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "game.h"
 
-FightInteractionChoice gameFightInteractionMenu() {
-    int input;
-    do {
-        printf("1) Attack enemy 2) Run away!\n");
-        printf(">> ");
-        if (scanf(" %d", &input) != 1) {
-            while (getchar() != '\n') {}
-        }
-    } while (input != 1 && input != 2);
-    return (input == 1 ? ATTACK : RUN);
+void gameInteractionEnumPrint() {
+    printf("Decide what to do:\n");
+    for (int i = 0; i < GAME_INTERACTION_CHOICE_COUNT; ++i) {
+        if (i) putchar(' ');
+        printf("%d) %s", i + 1, gameInteractionEnumGetString(i));
+    }
+    putchar('\n');
 }
 
-void gameStartFightBetween(Player *player, Monster *monster) {
+const char *gameInteractionEnumGetString(GameInteractionChoice choice) {
+    const char *choiceStr;
+    switch (choice) {
+        case MOVE_LEFT:
+            choiceStr = "Move left!";
+            break;
+        case MOVE_RIGHT:
+            choiceStr = "Move right!";
+            break;
+        case USE_ITEM:
+            choiceStr = "Use item!";
+            break;
+        case GO_TO_ROOM:
+            choiceStr = "Go to the room!";
+            break;
+        case SAVE_LEAVE:
+            choiceStr = "Leave and save the game!";
+            break;
+        default:
+            choiceStr = "Error!";
+            break;
+    }
+    return choiceStr;
+}
+
+Character *gameCreateCharacter() {
+    // Get name
+    const int MAX_LENGTH = 20;
+    printf("Choose name:\n");
+    char name[MAX_LENGTH];
+    bool leaveRequested;
+    do {
+        printf(">> ");
+        if (scanf("%20s", name) != 1) {
+            printf("Wrong input!");
+            leaveRequested = false;
+            while (getchar() != '\n') {}
+        } else {
+            leaveRequested = true;
+        }
+        putchar('\n');
+    } while (!leaveRequested);
+
+    // Get class
+    characterClassEnumPrint();
+    CharacterClass class = (CharacterClass) gameGetInputIdx("", 1, CLASS_COUNT);
+    return characterInit(name, class);
+}
+
+void gameStartFightBetween(Character *player, Monster *monster) {
     putchar('\n');
     printf("Fight initiated!\n");
-    while (playerIsAlive(player) && monsterIsAlive(monster)) {
+    while (characterIsAlive(player) && monsterIsAlive(monster)) {
         // Print player overview
         putchar('\n');
-        playerPrintOverview(player);
+        characterPrintOverview(player);
         printf("VS\n");
         monsterPrintOverview(monster);
 
-        // Menu
-        FightInteractionChoice choice;
-        choice = gameFightInteractionMenu();
+        // Print choices
+        gameFightInteractionEnumPrint();
 
         // Handle choice
-        switch (choice) {
-            case ATTACK:
-                playerAttackMonster(player, monster);
+        switch ((FightInteractionChoice) gameGetInputIdx("", 1, FIGHT_COUNT)) {
+            case FIGHT_ATTACK:
+                characterAttackMonster(player, monster);
                 break;
-            case RUN:
+            case FIGHT_RUN:
                 printf("Player %s decides to run away!\n", player->name);
                 return;
             default:
@@ -45,12 +93,12 @@ void gameStartFightBetween(Player *player, Monster *monster) {
         // Check whether someone died
         if (!monsterIsAlive(monster)) {
             printf("'%s' wins the fight!\n", player->name);
-            int exp = monster->level * 100;
+            int exp = monster->level * 60;
             player->experiences += exp;
             printf("You've gained %d experiences!\n", exp);
-            playerCheckLevelUp(player);
+            characterCheckLevelUp(player);
             return;
-        } else if (!playerIsAlive(player)) {
+        } else if (!characterIsAlive(player)) {
             printf("Monster managed to defeat you!\n");
             return;
         }
@@ -60,75 +108,33 @@ void gameStartFightBetween(Player *player, Monster *monster) {
     }
 }
 
-Player *gameCreateCharacter() {
-    const int MAX_LENGTH = 20;
-    printf("Choose name:\n");
-    char name[MAX_LENGTH];
-    bool leaveRequested;
-
-    do {
-        printf(">> ");
-        if (scanf("%s", name) != 1) {
-            printf("Wrong input!");
-            leaveRequested = false;
-            while (getchar() != '\n') {}
-        } else {
-            leaveRequested = true;
-        }
-        putchar('\n');
-    } while (!leaveRequested);
-
-    printf("Choose class: (KNIGHT, RANGER, ROGUE, MAGE)\n");
-    char class[MAX_LENGTH];
-    do {
-        printf(">> ");
-        if (scanf("%s", class) != 1 || playerParseClass(class) == ERR) {
-            printf("Wrong input!");
-            leaveRequested = false;
-            while (getchar() != '\n') {}
-        } else {
-            leaveRequested = true;
-        }
-        putchar('\n');
-    } while (!leaveRequested);
-    return playerInit(name, playerParseClass(class));
-}
-
-void gameMapInteractionMenu() {
-    const int choiceCount = 4;
-    printf("Decide what to do: 1) Move left! 2) Move right! 3) Go to the room! 4) Save and leave!\n");
-    int input;
-    bool isCorr;
-    do {
-        printf(">> ");
-        if (scanf("%d", &input) != 1 || input < 1 || input > choiceCount) {
-            isCorr = false;
-            while (getchar() != '\n');
-        } else {
-            isCorr = true;
-        }
-    } while (!isCorr);
-    switch (input) {
-        case 1:
-            if (mapPlayerMove(map.player, -1)) {
+void gameInteractionMenu(GameState *game) {
+    gameInteractionEnumPrint();
+    switch (gameGetInputIdx("", 1, GAME_INTERACTION_CHOICE_COUNT)) {
+        case MOVE_LEFT:
+            if (mapPlayerMove(game->map.player, -1)) {
                 printf("You've moved to the left!\n");
             } else {
                 printf("You can't go this way!\n");
             }
             break;
-        case 2:
-            if (mapPlayerMove(map.player, 1)) {
+        case MOVE_RIGHT:
+            if (mapPlayerMove(game->map.player, 1)) {
                 printf("You've moved to the right!\n");
             } else {
                 printf("You can't go this way!\n");
             }
             break;
-        case 3:
-            printf("You've gone to the room!\n");
-            gameStartFightBetween(map.player, &map.rooms[map.player->positionX].monster);
+        case USE_ITEM:
+            printf("Which one?\n");
+            inventoryUseItem(game->map.player, gameGetInputIdx("", 0, 5));
             break;
-        case 4:
-            gameIsRunning = false;
+        case GO_TO_ROOM:
+            printf("You've gone to the room!\n");
+            gameStartFightBetween(game->map.player, &game->map.rooms[game->map.player->positionX].monster);
+            break;
+        case SAVE_LEAVE:
+            game->gameIsRunning = false;
             break;
         default:
             printf("Wrong input!\n");
@@ -137,23 +143,73 @@ void gameMapInteractionMenu() {
 }
 
 // ******************************************************************************************************
-void gameLoop() {
-    gameIsRunning = true;
-    // load save file, otherwise create new Character
-    map.player = gameCreateCharacter();
-    mapRoomsInit(&map);
-
-    while (gameIsRunning) {
+void gameLoop(GameState *game) {
+    while (game->gameIsRunning) {
         // render playerOverview
-        playerPrintOverview(map.player);
+        characterPrintOverview(game->map.player);
         // render map
-        mapPrint(&map);
+        mapPrint(&game->map);
         // render choiceMenu
-        gameMapInteractionMenu();
+        gameInteractionMenu(game);
     }
-    playerFree(map.player);
+    characterFree(game->map.player);
 
 }
 // ******************************************************************************************************
 
+void gameStart(GameState *game) {
+    // load save file, otherwise create new Character
+    game->gameIsRunning = true;
+    game->map.player = gameCreateCharacter();
+    game->map.player->inventory[0] = ITEM_HP_POTION;
+    mapRoomsInit(&game->map);
+    // Start game loop
+    gameLoop(game);
+}
+
+int gameGetInputIdx(const char *str, int from, int to) {
+    bool leaveRequested;
+    int input;
+    if (strcmp(str, "") != 0) {
+        printf("%s\n", str);
+    }
+    do {
+        printf(">> ");
+        if (scanf("%d", &input) != 1 || input < from || input > to) {
+            printf("Wrong input!");
+            leaveRequested = false;
+            while (getchar() != '\n') {}
+        } else {
+            leaveRequested = true;
+        }
+        putchar('\n');
+    } while (!leaveRequested);
+    return input - 1;
+}
+
+const char *gameFightInteractionEnumGetString(FightInteractionChoice choice) {
+    const char *choiceStr;
+    switch (choice) {
+        case FIGHT_ATTACK:
+            choiceStr = "Attack!";
+            break;
+        case FIGHT_RUN:
+            choiceStr = "Run away!";
+            break;
+        case FIGHT_COUNT:
+        default:
+            choiceStr = "Error!";
+            break;
+    }
+    return choiceStr;
+}
+
+void gameFightInteractionEnumPrint() {
+    printf("Decide what to do:\n");
+    for (int i = 0; i < FIGHT_COUNT; ++i) {
+        if (i) putchar(' ');
+        printf("%d) %s", i + 1, gameFightInteractionEnumGetString(i));
+    }
+    putchar('\n');
+}
 

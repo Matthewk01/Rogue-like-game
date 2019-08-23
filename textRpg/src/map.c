@@ -20,20 +20,21 @@ void mapPrint(Map *map) {
 }
 
 void mapRoomsInit(Map *map) {
+    int multiplier = 3;
     for (int i = 0; i < ROOM_COUNT; ++i) {
         map->rooms[i].monster.level = i + 1;
-        map->rooms[i].monster.hp = 50 + i * 10;
-        map->rooms[i].monster.HP_MAX = 50 + i * 10;
-        map->rooms[i].monster.defense = 10 + i * 5;
-        map->rooms[i].monster.damage = 5 + i * 3;
+        map->rooms[i].monster.hp = 50 + i * multiplier;
+        map->rooms[i].monster.HP_MAX = 50 + i * multiplier;
+        map->rooms[i].monster.defense = 5 + i * multiplier;
+        map->rooms[i].monster.damage = 8 + i * multiplier;
     }
 }
 
-bool mapPlayerMove(Player *player, int dir) {
+bool mapPlayerMove(Character *player, int dir) {
     int newPosX = player->positionX + dir;
     // Check for collisions
     if (newPosX >= 0 && newPosX < ROOM_COUNT) {
-        playerMoveTo(player, newPosX);
+        characterMoveTo(player, newPosX);
         return true;
     }
     return false;
