@@ -4,6 +4,7 @@
 #include <string.h>
 #include "character.h"
 #include "monster.h"
+#include "logger.h"
 
 Character *characterInit(const char *name, CharacterClass role) {
     static int playerCount = 0;
@@ -16,8 +17,9 @@ Character *characterInit(const char *name, CharacterClass role) {
         tmpPlayer->isAI = false;
     }
 
-    // Init inventory
+    // Init inventory and Equip
     inventoryInit(&tmpPlayer->inventory);
+    inventoryEquipInit(&tmpPlayer->equip);
 
     // Init attributes
     tmpPlayer->name = strdup(name);
@@ -76,7 +78,8 @@ void characterCheckLevelUp(Character *player) {
     if (player->experiences > 99) {
         player->experiences = 0;
         player->level += 1;
-        printf("Player '%s' leveled  up! (%d)\n", player->name, player->level);
+        snprintf(buffer, sizeof(buffer), "Player '%s' leveled  up! (%d)\n", player->name, player->level);
+        loggerPrint(buffer);
     }
 }
 
@@ -110,6 +113,7 @@ void characterPrintOverview(Character *playerPtr) {
     characterGraphicPrintHP(playerPtr);
     characterGraphicPrintExpBar(playerPtr);
     inventoryPrint(&playerPtr->inventory);
+    inventoryEquipPrint(&playerPtr->equip);
     for (int i = 0; i < BORDER_STAR_COUNT; ++i) putchar('*');
     putchar('\n');
 }
@@ -121,21 +125,23 @@ void characterMoveTo(Character *player, int xPosition) {
 void characterAttackMonster(Character *from, Monster *to) {
     int damage = from->damage - to->defense;
     if (!monsterIsAlive(to)) {
-        printf("The target is already dead!\n");
+        loggerPrint("The target is already dead!\n");
     } else {
         if (damage <= 0) {
-            printf("Monster managed to block the player's %s attack!\n", from->name);
+            snprintf(buffer, sizeof(buffer), "Monster managed to block the player's %s attack!\n", from->name);
+            loggerPrint(buffer);
         } else {
             to->hp -= (damage);
             if (to->hp < 0) to->hp = 0;
-            printf("Player '%s' dealed '%d' damage. Enemy's hp: %d\n", from->name, damage,
-                   to->hp);
+            snprintf(buffer, sizeof(buffer), "Player '%s' dealed '%d' damage. Enemy's hp: %d\n", from->name, damage,
+                     to->hp);
+            loggerPrint(buffer);
         }
     }
 }
 
 void characterClassEnumPrint() {
-    printf("Choose class:\n");
+    loggerPrint("Choose class:\n");
     for (int i = 0; i < CLASS_COUNT; ++i) {
         if (i) putchar(' ');
         printf("%d) %s", i + 1, characterClassEnumGetString(i));
@@ -179,31 +185,53 @@ void characterGraphicPrintExpBar(Character *player) {
     putchar('\n');
 }
 
-void playerUseItem(Character *player, int positionIdx) {
+void characterUseItem(Character *player, int positionIdx) {
     for (int i = 0; i < INVENTORY_SLOTS; ++i) {
         if (i == positionIdx) {
             Item *item = &player->inventory.items[i];
             switch (player->inventory.items[i].type) {
                 case ITEM_TYPE_HP_POTION:
                     player->hp += item->hpAmount;
-                    if(player->hp > player->HP_MAX) player->hp = player->HP_MAX;
+                    if (player->hp > player->HP_MAX) player->hp = player->HP_MAX;
                     --item->quantity;
                     if (item->quantity <= 0) {
                         *item = ITEM_EMPTY_ITEM;
                     }
                     break;
                 case ITEM_TYPE_WEAPON:
+                    if (player->equip.items[item->idx].type == ITEM_TYPE_WEAPON) {
+                        player->damage -= player->equip.items[item->idx].bonusDamage;
+                    }
+                    if (inventoryEquipItem(&player->equip, &player->inventory, positionIdx)) {
+                        player->damage += item->bonusDamage;
+                    }
                     break;
                 case ITEM_TYPE_SHIELD:
+                    if (player->equip.items[item->idx].type == ITEM_TYPE_SHIELD) {
+                        player->defense -= player->equip.items[item->idx].bonusDefense;
+                    }
+                    if (inventoryEquipItem(&player->equip, &player->inventory, positionIdx)) {
+                        player->defense += item->bonusDefense;
+                    }
                     break;
                 case ITEM_TYPE_EMPTY:
                 default:
-                    printf("Nothing happened!\n");
+                    loggerPrint("Nothing happened!\n");
                     break;
             }
             return;
         }
     }
+}
+
+bool characterBuyItem(Character *player, const Item *item) {
+    if (player->currency < item->price)
+        return false;
+    if (!inventoryHasEmptySlot(&player->inventory))
+        return false;
+    player->currency -= item->price;
+    inventoryPushBackItem(&player->inventory, item);
+    return true;
 }
 
 

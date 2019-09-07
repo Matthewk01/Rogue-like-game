@@ -32,6 +32,8 @@ typedef struct Character {
     //Inventory
     int currency;
     Inventory inventory;
+    // Equip
+    Equip equip;
 } Character;
 
 Character *characterInit(const char *name, CharacterClass role);
@@ -54,4 +56,6 @@ typedef struct Monster Monster;
 
 void characterAttackMonster(Character *from, Monster *to);
 
-void playerUseItem(Character *player, int positionIdx);
+void characterUseItem(Character *player, int positionIdx);
+
+bool characterBuyItem(Character *player, const Item *item);

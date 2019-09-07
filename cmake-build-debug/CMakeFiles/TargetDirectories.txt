@@ -1,0 +1,3 @@
+/cygdrive/d/Programming/GitHub/textRpg/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/cygdrive/d/Programming/GitHub/textRpg/cmake-build-debug/CMakeFiles/textRpg.dir
+/cygdrive/d/Programming/GitHub/textRpg/cmake-build-debug/CMakeFiles/edit_cache.dir

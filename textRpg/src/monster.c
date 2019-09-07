@@ -3,6 +3,7 @@
 #include <math.h>
 #include "monster.h"
 #include "character.h"
+#include "logger.h"
 
 Monster *monsterInit() {
     Monster *monster = (Monster *) malloc(sizeof(*monster));
@@ -50,12 +51,14 @@ void monsterAttackPlayer(Monster *from, Character *to) {
         printf("The target is already dead!\n");
     } else {
         if (damage <= 0) {
-            printf("Player managed to block the monster's attack!\n");
+            snprintf(buffer, sizeof(buffer), "Player managed to block the monster's attack!\n");
+            loggerPrint(buffer);
         } else {
             to->hp -= (damage);
             if (to->hp < 0) to->hp = 0;
-            printf("Monster dealed '%d' damage. Enemy's hp: %d\n", damage,
-                   to->hp);
+            snprintf(buffer, sizeof(buffer), "Monster dealed '%d' damage. Enemy's hp: %d\n", damage,
+                     to->hp);
+            loggerPrint(buffer);
         }
     }
 }

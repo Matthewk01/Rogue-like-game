@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "game.h"
+#include "logger.h"
 
 void gameInteractionEnumPrint() {
-    printf("Decide what to do:\n");
+    loggerPrint("Decide what to do:\n");
     for (int i = 0; i < GAME_INTERACTION_CHOICE_COUNT; ++i) {
         if (i) putchar(' ');
         printf("%d) %s", i + 1, gameInteractionEnumGetString(i));
@@ -66,12 +67,12 @@ Character *gameCreateCharacter() {
 
 void gameStartFightBetween(Character *player, Monster *monster) {
     putchar('\n');
-    printf("Fight initiated!\n");
+    loggerPrint("Fight initiated!\n");
     while (characterIsAlive(player) && monsterIsAlive(monster)) {
         // Print player overview
         putchar('\n');
         characterPrintOverview(player);
-        printf("VS\n");
+        loggerPrint("VS\n");
         monsterPrintOverview(monster);
 
         // Print choices
@@ -83,7 +84,8 @@ void gameStartFightBetween(Character *player, Monster *monster) {
                 characterAttackMonster(player, monster);
                 break;
             case FIGHT_RUN:
-                printf("Player %s decides to run away!\n", player->name);
+                snprintf(buffer, sizeof(buffer), "Player %s decides to run away!\n", player->name);
+                loggerPrint(buffer);
                 return;
             default:
                 printf("Error: Undefined choice.\n");
@@ -95,18 +97,20 @@ void gameStartFightBetween(Character *player, Monster *monster) {
 
         // Check whether someone died
         if (!monsterIsAlive(monster)) {
-            printf("'%s' wins the fight!\n", player->name);
+            snprintf(buffer, sizeof(buffer), "'%s' wins the fight!\n", player->name);
+            loggerPrint(buffer);
             int exp = monster->level * 60;
             player->experiences += exp;
-            printf("You've gained %d experiences!\n", exp);
+            snprintf(buffer, sizeof(buffer), "You've gained %d experiences!\n", exp);
+            loggerPrint(buffer);
             characterCheckLevelUp(player);
             return;
         } else if (!characterIsAlive(player)) {
-            printf("Monster managed to defeat you!\n");
+            loggerPrint("Monster managed to defeat you!\n");
             return;
         }
 
-        // Wait for 250ms
+        // Wait
         Sleep(250);
     }
 }
@@ -116,34 +120,35 @@ void gameInteractionMenu(GameState *game) {
     switch (gameGetInputIdx("", 1, GAME_INTERACTION_CHOICE_COUNT)) {
         case MOVE_LEFT:
             if (mapPlayerMove(game->map.player, -1)) {
-                printf("You've moved to the left!\n");
+                loggerPrint("You've moved to the left!\n");
             } else {
-                printf("You can't go this way!\n");
+                loggerPrint("You can't go this way!\n");
             }
             break;
         case MOVE_RIGHT:
             if (mapPlayerMove(game->map.player, 1)) {
-                printf("You've moved to the right!\n");
+                loggerPrint("You've moved to the right!\n");
             } else {
-                printf("You can't go this way!\n");
+                loggerPrint("You can't go this way!\n");
             }
             break;
         case USE_ITEM:
-            printf("Which one?\n");
-            playerUseItem(game->map.player, gameGetInputIdx("", 1, 5));
+            loggerPrint("Which one?\n");
+            characterUseItem(game->map.player, gameGetInputIdx("", 1, 5));
             break;
         case GO_TO_ROOM:
-            printf("You've gone to the room!\n");
+            loggerPrint("You've gone to the room!\n");
             gameStartFightBetween(game->map.player, &game->map.rooms[game->map.player->positionX].monster);
             break;
         case BUY_ITEMS:
             // NPC menu
+            gameBuyMenu(game);
             break;
         case SAVE_LEAVE:
             game->gameIsRunning = false;
             break;
         default:
-            printf("Wrong input!\n");
+            loggerPrint("Wrong input!\n");
             break;
     }
 }
@@ -157,6 +162,8 @@ void gameLoop(GameState *game) {
         mapPrint(&game->map);
         // render choiceMenu
         gameInteractionMenu(game);
+        // Wait
+        Sleep(250);
     }
     characterFree(game->map.player);
 
@@ -174,8 +181,10 @@ void gameStart(GameState *game) {
     inventoryPushBackItem(&game->map.player->inventory, &ITEM_HP_POTION);
     inventoryPushBackItem(&game->map.player->inventory, &ITEM_HP_POTION);
     inventoryPushBackItem(&game->map.player->inventory, &ITEM_HP_POTION);
-    inventoryPushBackItem(&game->map.player->inventory, &ITEM_SHIELD);
-    inventoryPushBackItem(&game->map.player->inventory, &ITEM_WEAPON);
+    inventoryPushBackItem(&game->map.player->inventory, &ITEM_SHIELD_BRONZE);
+    inventoryPushBackItem(&game->map.player->inventory, &ITEM_WEAPON_BRONZE);
+    inventoryPushBackItem(&game->map.player->inventory, &ITEM_SHIELD_BRONZE);
+    inventoryPushBackItem(&game->map.player->inventory, &ITEM_WEAPON_BRONZE);
 
     // Start game loop
     gameLoop(game);
@@ -190,7 +199,7 @@ int gameGetInputIdx(const char *str, int from, int to) {
     do {
         printf(">> ");
         if (scanf("%d", &input) != 1 || input < from || input > to) {
-            printf("Wrong input!");
+            loggerPrint("Wrong input!");
             leaveRequested = false;
             while (getchar() != '\n') {}
         } else {
@@ -219,11 +228,34 @@ const char *gameFightInteractionEnumGetString(FightInteractionChoice choice) {
 }
 
 void gameFightInteractionEnumPrint() {
-    printf("Decide what to do:\n");
+    loggerPrint("Decide what to do:\n");
     for (int i = 0; i < FIGHT_COUNT; ++i) {
         if (i) putchar(' ');
         printf("%d) %s", i + 1, gameFightInteractionEnumGetString(i));
     }
     putchar('\n');
 }
+
+void gameBuyMenu(GameState *game) {
+    loggerPrint("What item would you like to buy ?\n");
+    loggerPrint("1) Bronze Sword (30g) 2) Bronze Shield (30g) 3) Health Potion (10g)\n");
+    const Item *itemToBuy;
+    switch (gameGetInputIdx("", 1, 3)) {
+        case 0:
+            itemToBuy = &ITEM_WEAPON_BRONZE;
+            break;
+        case 1:
+            itemToBuy = &ITEM_SHIELD_BRONZE;
+            break;
+        case 2:
+            itemToBuy = &ITEM_HP_POTION;
+            break;
+        default:
+            itemToBuy = NULL;
+            break;
+    }
+    characterBuyItem(game->map.player, itemToBuy);
+}
+
+
 

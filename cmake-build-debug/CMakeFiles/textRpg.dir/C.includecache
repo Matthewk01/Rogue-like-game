@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/cygdrive/d/Programming/GitHub/textRpg/textRpg/src/character.c
+stdio.h
+-
+stdlib.h
+-
+math.h
+-
+string.h
+-
+character.h
+/cygdrive/d/Programming/GitHub/textRpg/textRpg/src/character.h
+monster.h
+/cygdrive/d/Programming/GitHub/textRpg/textRpg/src/monster.h
+logger.h
+/cygdrive/d/Programming/GitHub/textRpg/textRpg/src/logger.h
+
+/cygdrive/d/Programming/GitHub/textRpg/textRpg/src/character.h
+stdbool.h
+-
+inventory.h
+/cygdrive/d/Programming/GitHub/textRpg/textRpg/src/inventory.h
+
+/cygdrive/d/Programming/GitHub/textRpg/textRpg/src/inventory.h
+stdbool.h
+-
+
+/cygdrive/d/Programming/GitHub/textRpg/textRpg/src/logger.h
+
+/cygdrive/d/Programming/GitHub/textRpg/textRpg/src/monster.h
+stdbool.h
+-
+

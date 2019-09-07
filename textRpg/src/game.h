@@ -46,3 +46,4 @@ void gameStart(GameState *game);
 
 int gameGetInputIdx(const char *str, int from, int to);
 
+void gameBuyMenu(GameState *game);

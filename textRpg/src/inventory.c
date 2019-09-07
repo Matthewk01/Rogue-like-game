@@ -5,7 +5,10 @@
 
 const Item ITEM_EMPTY_ITEM = {
         ITEM_TYPE_EMPTY,
+        EQUIP_NULL,
         "Empty_slot",
+        false,
+        0,
         0,
         0,
         0,
@@ -14,29 +17,38 @@ const Item ITEM_EMPTY_ITEM = {
 
 const Item ITEM_HP_POTION = {
         ITEM_TYPE_HP_POTION,
+        EQUIP_NULL,
         "HP Potion",
+        false,
         0,
         0,
         25,
-        1
+        1,
+        10
 };
 
-const Item ITEM_WEAPON = {
+const Item ITEM_WEAPON_BRONZE = {
         ITEM_TYPE_WEAPON,
-        "Weapon",
+        EQUIP_WEAPON,
+        "Bronze Sword",
+        true,
         0,
         20,
         0,
-        1
+        1,
+        30
 };
 
-const Item ITEM_SHIELD = {
+const Item ITEM_SHIELD_BRONZE = {
         ITEM_TYPE_SHIELD,
-        "Shield",
+        EQUIP_SHIELD,
+        "Bronze Shield",
+        true,
         20,
         0,
         0,
-        1
+        1,
+        30
 };
 
 Item *inventoryCreateItem(ItemType type) {
@@ -107,4 +119,52 @@ void inventoryPrint(Inventory *inv) {
         }
     }
     putchar('\n');
+}
+
+bool inventoryEquipItem(Equip *equip, Inventory *inventory, int positionIdx) {
+    Item *itemToEquip = &inventory->items[positionIdx];
+    if(itemToEquip->type == ITEM_TYPE_EMPTY || !itemToEquip->wearable)
+        return false;
+    if(equip->items[itemToEquip->idx].type == ITEM_TYPE_EMPTY){
+        equip->items[itemToEquip->idx] = *itemToEquip;
+        itemToEquip->quantity -= 1;
+        if(itemToEquip->quantity <= 0) *itemToEquip = ITEM_EMPTY_ITEM;
+    } else {
+        Item itemTmp = equip->items[itemToEquip->idx];
+        itemToEquip->quantity -= 1;
+        equip->items[itemToEquip->idx] = *itemToEquip;
+        inventoryPushBackItem(inventory, &itemTmp);
+    }
+    return true;
+}
+
+void inventoryEquipInit(Equip *equip) {
+    for(size_t i = 0; i < EQUIP_COUNT; ++i) {
+        equip->items[i] = ITEM_EMPTY_ITEM;
+    }
+}
+
+void inventoryEquipPrint(Equip *equip) {
+    printf("Equipment: ");
+    const char *equipNames[] = {"Weapon", "Shield"};
+    for (int i = 0; i < EQUIP_COUNT; ++i) {
+        const Item *item = &equip->items[i];
+        if (i) printf(" | ");
+        if(item->type == ITEM_TYPE_WEAPON) {
+            printf("%s) %s (+%d to dmg)", equipNames[i], item->name, item->bonusDamage);
+        } else {
+            printf("%s) %s (+%d to def)", equipNames[i], item->name, item->bonusDefense);
+        }
+
+    }
+    putchar('\n');
+}
+
+bool inventoryHasEmptySlot(Inventory *inv) {
+    for (int i = 0; i < INVENTORY_SLOTS; ++i) {
+        if (inv->items[i].type == ITEM_TYPE_EMPTY) {
+            return true;
+        }
+    }
+    return false;
 }
